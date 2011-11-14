@@ -15,4 +15,69 @@ values(grl)<-data.frame(counts=sample(1:100,size=6), score=rnorm(6))
 #start(grl) - start values
 #end(grl)  - end values
 
+#Only draws one arch
+halfCircleArch<-function(startX, endX, y, h){
+	xx<-c()
+	yy<-c()
+	
+	#number of points used to draw quarter of the curve
+	n=500
+	for(i in 1:n){
+		ang<-i*pi/(2*n)
+		xx[i]<-cos(ang)
+		yy[i]<-sin(ang)
+	}
+	
+	#sets point for complete curve,makes sides are even.
+	xx<-c(1,xx,rev(-xx),-1)
+	yy<-c(0,yy,rev(yy), 0)
+	
+	xx<-xx*(abs(startX-endX)/2)+(startX+endX)/2
+	yy<-yy*h+y
+	
+	#plots curve using ggplot package
+	return(qplot(xx, yy, geom="line"))
+}
 
+#Draws multiple arches.  
+#startX= vector of start positions
+#endX= vector of end positions
+#y= single value for y position
+#h= vector of hights of arches
+#all vectors must be the same length or this will probably break. 
+Arches<-function(startX, endX, y, h){
+	#Need to add something here to make sure 
+	#startX, endX, and h are the same length vectors.
+	
+	xx<-c()
+	yy<-c()
+	
+	#number of points used to draw quarter of the curve
+	n=500
+	for(i in 1:n){
+		ang<-i*pi/(2*n)
+		xx[i]<-cos(ang)
+		yy[i]<-sin(ang)
+	}
+	
+	#sets point for complete curve,makes sides are even.
+	xx<-c(1,xx,rev(-xx),-1)
+	yy<-c(0,yy,rev(yy), 0)
+	apoint<-data.frame()
+	for(i in 1:length(startX)){
+		temp<-data.frame(xx=xx*(abs(startX[i]-endX[i])/2)+(startX[i]+endX[i])/2,
+						 yy=yy*h[i]+y,
+						 junc=i)
+		apoint<-rbind(apoint,temp)
+	}
+	ggplot(apoint, aes(xx,yy, group=junc))+geom_line()
+}
+
+#Testing code
+start <-c(1,2,3)
+end   <-c(5,6,7)
+height<-c(2,5,1)
+y=2
+
+halfCircleArch(1,3, 2, 3)
+Arches(start,end, y, height)
