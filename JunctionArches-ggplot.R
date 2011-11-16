@@ -21,37 +21,40 @@ values(grl)<-data.frame(counts=sample(1:100,size=6), score=rnorm(6))
 #y= single value for y position
 #h= vector of hights of arches
 #all vectors must be the same length or this will probably break. 
-Arches<-function(startX, endX, y, h){
-	#Need to add something here to make sure 
-	#startX, endX, and h are the same length vectors.
-	
+
+geom_arch<-function(data,...,startX, endX, y, h){
 	xx<-c()
 	yy<-c()
 	
-	#number of points used to draw quarter of the curve
-	n=500
+	#CREATES UNIT ARCH
+	#only calculate points to draw a quarter of the curve, reduces time spent in for loop
+	n=500 #number of points to draw quarter of curve, just has to be sufficiently high so curve looks smooth
 	for(i in 1:n){
 		ang<-i*pi/(2*n)
 		xx[i]<-cos(ang)
 		yy[i]<-sin(ang)
 	}
-	
-	#sets point for complete curve,makes sides are even.
+	#takes the quarter of the curve calculated, flips a copy over the y axis
+	#reduces time spent in for loop
 	xx<-c(1,xx,rev(-xx),-1)
 	yy<-c(0,yy,rev(yy), 0)
+	
+	#SETS UP DATAFRAME TO KEEP TRACK OF ALL POINTS TO DRAW ALL ARCHES
 	apoint<-data.frame()
+	jump<-abs(endX-startX)
+	jumpAdj=max(jump)/max(abs(h))
 	for(i in 1:length(startX)){
 		temp<-data.frame(xx=xx*(abs(startX[i]-endX[i])/2)+(startX[i]+endX[i])/2,
 						 yy=yy*h[i]+y,
-						 junc=i)
-		apoint<-rbind(apoint,temp)
+						 junc=i,
+						 s=(abs(h[i])-jump[i]/jumpAdj))
+		apoint<-rbind(apoint,temp)	
 	}
-	ggplot(apoint, aes(xx,yy, group=junc))+geom_line()
+	geom_line(data=apoint, aes(xx,yy,group=junc,size=s,colour=s))
 }
 
-#Testing code
-start <-c(1,2,3)
-end   <-c(5,6,7)
-height<-c(2,-1.5,1)
-y=2
-Arches(start,end, y, height)
+#TESTING CODE
+start<-c(rep(1, 25)); end<-c(2:26); height<-c(rep(c(1:5, 1:5*(-1)), 2), c(1:5)); y=0
+ggplot()+geom_arch(startX=start,endX=end, y=y, h=height)->p
+p+scale_size(to = c(0.5, 2))+scale_colour_gradient(low="grey", high="black")+opts(legend.position="none") #Figure 3
+
