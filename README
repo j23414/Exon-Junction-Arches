@@ -1,0 +1,13 @@
+# =======================================
+# Author: Jennifer Chang
+# Date: November 16, 2011
+# =======================================
+
+This was part of a rotation project at ISU
+in Dr Di Cook's lab. The purpose was to design
+an R function to visualize exon junction reads.
+
+FILE 	      	 	   DESCRIPTION
+Exon-Junction-Arches.Rnw   sweave script and description
+Exon-Junction-Arches.pdf   writeup
+presentation.pdf	   student seminar presentation
